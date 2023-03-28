@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service                    # Type of kubernetes resource
+metadata:
+  name: minisrv-service          # Name of the resource
+spec:
+  type: NodePort                 # A port is opened on each node in your cluster via Kube proxy.
+  ports:                         # Take incoming HTTP requests on port 9090 and forward them to the targetPort of 8080
+  - name: http
+    port: 9090
+    targetPort: 8080
+    nodePort: 30001
+  selector:
+    app: minisrv                 # Map any pod with label `app=go-hello-world` to this service
+    
