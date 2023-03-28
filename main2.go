@@ -15,7 +15,7 @@ import (
 )
 
 var sad = false
-var broken = false
+var busy = false
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -25,9 +25,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Set sad flag
 	sad = strings.Contains(strings.ToLower(name), "sad")
-	if strings.Contains(strings.ToLower(name), "kaputt") {
-		// Flip if received "kaputt"
-		broken = !broken
+	if strings.Contains(strings.ToLower(name), "busy") {
+		// Flip if received "busy"
+		busy = !busy
 	}
 	const MAX_LEN = 32
 	guest_name, _ := os.LookupEnv("HOSTNAME")
@@ -37,28 +37,36 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		from = str_len - MAX_LEN
 	}
 	log.Printf("Received request for %s\n", name)
-	w.Write([]byte(fmt.Sprintf("Hello, %s from container %s (sad: %t, broken %t)\n", name, guest_name[from:str_len], sad, broken)))
+	w.Write([]byte(fmt.Sprintf("Hello, %s from container %s (sad: %t, busy: %t)\n", name, guest_name[from:str_len], sad, busy)))
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	var status int
+	var ret string
 	if sad {
 		status = http.StatusInternalServerError
+		ret = fmt.Sprintf("error")
 	} else {
 		status = http.StatusOK
+		ret = fmt.Sprintf("ok")
 	}
 	w.WriteHeader(status)
+	w.Write([]byte(ret))
 	log.Printf("HealthHandler sent %d\n", status)
 }
 
 func readinessHandler(w http.ResponseWriter, r *http.Request) {
 	var status int
-	if broken {
+	var ret string
+	if busy {
 		status = http.StatusServiceUnavailable
+		ret = fmt.Sprintf("busy")
 	} else {
 		status = http.StatusOK
+		ret = fmt.Sprintf("ok")
 	}
 	w.WriteHeader(status)
+	w.Write([]byte(ret))
 	log.Printf("ReadinessHandler sent %d\n", status)
 }
 
