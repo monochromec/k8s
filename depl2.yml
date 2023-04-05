@@ -25,7 +25,7 @@ spec:
             port: 8080
             scheme: HTTP
           initialDelaySeconds: 5
-          periodSeconds: 15
+          periodSeconds: 1
           timeoutSeconds: 5
         readinessProbe:          # To check if the Pod is ready to serve traffic or not
           httpGet:
@@ -34,3 +34,4 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 5
           timeoutSeconds: 1    
+          periodSeconds: 1
