@@ -1,5 +1,5 @@
 # k8s
-FraLUG talk on k8s
+OpenSUSEConf talk on k8s
 
 * Dockerfile: staged golang builder image definition
 * main1.go: Simple HTTP server
