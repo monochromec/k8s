@@ -14,8 +14,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const BUSY_MAX = 5
+
 var sad = false
 var busy = false
+var busy_counter = 0
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -35,8 +38,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if strings.Contains(strings.ToLower(name), "busy") {
-		// Flip if received "busy"
-		busy = !busy
+		// Set if received "busy"
+		busy = true
 	}
 	const MAX_LEN = 32
 	guest_name, _ := os.LookupEnv("HOSTNAME")
@@ -69,6 +72,12 @@ func readinessHandler(w http.ResponseWriter, r *http.Request) {
 	var ret string
 	if busy {
 		status = http.StatusInternalServerError
+		busy_counter++
+		// Indicate not busy after three invocations
+		if busy_counter == BUSY_MAX {
+			busy = false
+			busy_counter = 0
+		}
 		ret = fmt.Sprintf("busy")
 	} else {
 		status = http.StatusOK
